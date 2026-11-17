@@ -7,6 +7,7 @@ import * as db from '../db.js';
 import { esc, uuid, todayStr, roundLabel, compareCrops, blobUrl, toast } from '../utils.js';
 import { STAMPS } from '../stamps.js';
 import { processPhoto } from '../photo.js';
+import { moonOfDay } from '../moon.js';
 
 const STAMP_ROWS = [
   { label: '', cats: ['work'] },
@@ -19,7 +20,10 @@ export async function render(ctx) {
     db.listAreas(), db.listCrops(), editId ? db.getRecord(editId) : null,
   ]);
   const fromCrop = ctx.query.crop || null;
-  const backHash = fromCrop ? `#/crop/${fromCrop}` : '#/';
+  // カレンダーなどから来たときは back= で戻り先を受け取る（アプリ内の # で始まる場所だけ許可）
+  const backParam = ctx.query.back && ctx.query.back.startsWith('#/') ? ctx.query.back : null;
+  const backHash = backParam || (fromCrop ? `#/crop/${fromCrop}` : '#/');
+  const initialDate = /^\d{4}-\d{2}-\d{2}$/.test(ctx.query.date || '') ? ctx.query.date : todayStr();
 
   if (editId && !record) {
     ctx.setHeader({ title: '見つかりません', back: backHash });
@@ -31,7 +35,7 @@ export async function render(ctx) {
   ctx.setHeader({ title: isEdit ? '記録を編集' : (isBulk ? 'まとめて記録' : '記録する'), back: backHash });
 
   const state = {
-    date: record?.date || todayStr(),
+    date: record?.date || initialDate,
     cropIds: new Set(record?.cropIds || (fromCrop ? [fromCrop] : [])),
     stamps: new Set(record?.stamps || []),
     memo: record?.memo || '',
@@ -107,7 +111,7 @@ export async function render(ctx) {
       </div>
 
       <div class="field">
-        <label class="label" for="f-date">日付</label>
+        <label class="label" for="f-date">日付 <span class="moon-inline" data-moon></span></label>
         <input id="f-date" class="input" type="date" value="${esc(state.date)}" required>
       </div>
 
@@ -123,6 +127,18 @@ export async function render(ctx) {
   const toggleBtn = el.querySelector('[data-act="toggle-picker"]');
   const previews = el.querySelector('.photo-previews');
   if (isBulk) toggleBtn.hidden = true;
+
+  // 日付の横に月齢を出す（日付を変えたら更新）
+  const dateInput = el.querySelector('#f-date');
+  const moonEl = el.querySelector('[data-moon]');
+  const drawMoon = () => {
+    const v = dateInput.value;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) { moonEl.textContent = ''; return; }
+    const m = moonOfDay(v);
+    moonEl.textContent = `${m.emoji} 月齢 ${m.ageText}${m.phase ? `（${m.phase}）` : ''}`;
+  };
+  drawMoon();
+  dateInput.addEventListener('change', drawMoon);
 
   const drawSummary = () => {
     const selected = [...state.cropIds].map((id) => cropMap.get(id)).filter(Boolean);

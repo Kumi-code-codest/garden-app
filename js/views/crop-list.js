@@ -1,8 +1,9 @@
 // ① 一覧（エリア別 / すべて）
 
 import * as db from '../db.js';
-import { esc, formatDate, shortDate, roundLabel, compareCrops, areaChip } from '../utils.js';
+import { esc, formatDate, shortDate, roundLabel, compareCrops, areaChip, todayStr } from '../utils.js';
 import { stampEmoji, sortStamps } from '../stamps.js';
+import { moonOfDay } from '../moon.js';
 
 const MODE_KEY = 'garden.listMode';
 function loadMode() {
@@ -14,7 +15,19 @@ function saveMode(m) {
 
 export async function render(ctx) {
   const [areas, crops, records] = await Promise.all([db.listAreas(), db.listCrops(), db.listRecords()]);
-  ctx.setHeader({ title: '菜園きろく', actions: [{ href: '#/settings', icon: '⚙️', label: '設定' }] });
+  ctx.setHeader({
+    title: '菜園きろく',
+    actions: [
+      { href: '#/calendar', icon: '📅', label: 'カレンダー' },
+      { href: '#/settings', icon: '⚙️', label: '設定' },
+    ],
+  });
+  const moon = moonOfDay(todayStr());
+  const todayLine = `
+    <a class="today-line" href="#/calendar">
+      <span>今日 ${formatDate(todayStr())}</span>
+      <span>${moon.emoji} 月齢 ${moon.ageText}${moon.phase ? `（${moon.phase}）` : ''}</span>
+    </a>`;
 
   // 作付けごとの最新の記録
   const latest = new Map();
@@ -124,6 +137,7 @@ export async function render(ctx) {
       return;
     }
     ctx.el.innerHTML = `
+      ${todayLine}
       <div class="seg" role="tablist">
         <button type="button" data-mode="area" aria-pressed="${mode === 'area'}">エリア別</button>
         <button type="button" data-mode="all" aria-pressed="${mode === 'all'}">すべて</button>

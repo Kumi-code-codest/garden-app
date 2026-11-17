@@ -7,6 +7,7 @@ import * as cropDetail from './views/crop-detail.js';
 import * as cropForm from './views/crop-form.js';
 import * as recordForm from './views/record-form.js';
 import * as settings from './views/settings.js';
+import * as calendar from './views/calendar.js';
 
 const routes = [
   { re: /^\/$/, view: cropList },
@@ -16,6 +17,7 @@ const routes = [
   { re: /^\/record\/new$/, view: recordForm },
   { re: /^\/record\/([^/]+)\/edit$/, view: recordForm, keys: ['id'] },
   { re: /^\/settings$/, view: settings },
+  { re: /^\/calendar$/, view: calendar },
 ];
 
 const main = document.getElementById('main');
@@ -50,12 +52,14 @@ function applyHeader({ title = '菜園きろく', back = null, actions = [] }) {
   ).join('');
 }
 
-async function route() {
+async function route(e) {
   const token = ++renderToken;
   const hash = location.hash || '#/';
   if (hash !== currentHash) {
-    if (currentHash) scrollPositions.set(currentHash, window.scrollY);
-    prevHash = currentHash;
+    // 画面内で history.replaceState した場合もあるので、移動元はイベントの oldURL を優先する
+    const leaving = e && e.oldURL ? (new URL(e.oldURL).hash || '#/') : currentHash;
+    if (leaving) scrollPositions.set(leaving, window.scrollY);
+    prevHash = leaving;
     currentHash = hash;
   }
   document.querySelectorAll('.viewer').forEach((v) => v.remove());

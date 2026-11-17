@@ -3,6 +3,7 @@
 import * as db from '../db.js';
 import { esc, formatDate, todayStr, daysBetween, roundLabel, areaChip, blobUrl, toast } from '../utils.js';
 import { STAMP_MAP, sortStamps } from '../stamps.js';
+import { moonOfDay } from '../moon.js';
 
 export async function render(ctx) {
   const id = ctx.params.id;
@@ -35,10 +36,11 @@ export async function render(ctx) {
       ? `<h3 class="month-title">${Number(month.slice(0, 4))}年${Number(month.slice(5))}月</h3>` : '';
     lastMonth = month;
     const others = r.cropIds.filter((c) => c !== id).map((c) => cropMap.get(c)).filter(Boolean);
+    const moon = moonOfDay(r.date);
     return `${monthHead}
       <article class="record">
         <div class="record-head">
-          <span class="record-date">${formatDate(r.date)}</span>
+          <span class="record-date">${formatDate(r.date)} <span class="record-moon" title="月齢 ${moon.ageText}">${moon.emoji}</span></span>
           <a class="btn-small" href="#/record/${esc(r.id)}/edit?crop=${esc(id)}">編集</a>
         </div>
         ${r.stamps.length ? `<div class="stamp-chips">${sortStamps(r.stamps).map((s) => {

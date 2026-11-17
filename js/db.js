@@ -179,6 +179,13 @@ export async function listRecordsByCrop(cropId) {
   return sortRecords(recs);
 }
 
+// 期間内（"YYYY-MM-DD" 両端含む）の記録
+export async function listRecordsBetween(fromStr, toStr) {
+  const recs = await run(['records'], 'readonly',
+    (tx) => reqP(tx.objectStore('records').index('date').getAll(IDBKeyRange.bound(fromStr, toStr))));
+  return sortRecords(recs);
+}
+
 // newPhotos: [{ blob, thumb }] / removedPhotoIds: 消す写真の id
 export function saveRecord(record, { newPhotos = [], removedPhotoIds = [] } = {}) {
   const now = Date.now();
