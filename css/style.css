@@ -1,20 +1,57 @@
 /* 家庭菜園記録アプリ：屋外・片手操作向けに大きめ・高コントラスト */
 
 :root {
+  /* ===== 色 =====
+     デザインを変えるときは、基本的にこのブロックだけを書き換える。
+     ※ 上部バーの色は index.html の theme-color と manifest.webmanifest の
+       theme_color / background_color にも同じ値を書くこと（CSS 変数は使えない） */
+
+  /* メインの色（ヘッダー・主ボタン・選択中の枠） */
   --green: #3f7d3a;
   --green-dark: #2d5e29;
   --green-soft: #e3efd9;
-  --bg: #f6f3ea;
-  --card: #ffffff;
+  --on-primary: #ffffff;        /* 緑の上の文字 */
+
+  /* 背景と面 */
+  --bg: #f6f3ea;                /* 画面全体の背景 */
+  --surface: #ffffff;           /* カード・入力欄・ボタンの背景 */
+  --surface-sunken: #e6e1d3;    /* 切り替えタブ・件数・写真の下地 */
+  --surface-muted: #efebe0;     /* 「過去の作付け」の背景 */
+  --badge-muted-bg: #ebe8df;    /* 「栽培終了」バッジ */
+
+  /* 文字と線 */
   --text: #2a2a26;
   --muted: #6d6a60;
+  --faint: #b7b09d;             /* 一覧の「›」 */
   --border: #ddd6c4;
+  --line-strong: #bbbbbb;       /* エリア未設定の枠など */
+  --area-none: #999999;         /* エリア未設定の色 */
+
+  /* アクセント（「2回目」バッジ） */
   --accent: #e2a33a;
   --accent-soft: #fbefd6;
+  --accent-text: #8a5a0c;
+
+  /* スタンプの種類ごとの色 */
+  --observe: #b83a2e;           /* 病害虫 */
+  --observe-soft: #f6e0dc;
+  --weather: #3b7fb5;           /* 晴れ・雨 */
   --sky-soft: #e2eef8;
+
+  /* 危険な操作（削除） */
   --danger: #b83a2e;
+
+  /* 写真ビューア・トースト・影 */
+  --overlay: rgba(0, 0, 0, .92);
+  --overlay-soft: rgba(0, 0, 0, .6);
+  --overlay-text: #cccccc;
+  --on-dark: #ffffff;
+  --toast-bg: rgba(30, 30, 28, .92);
+  --shadow: rgba(0, 0, 0, .12);
+
+  /* ===== 形と大きさ ===== */
   --radius: 14px;
-  --tap: 56px;
+  --tap: 56px;                  /* ボタンの高さ（指で押しやすい大きさ） */
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   color-scheme: light;
 }
@@ -49,7 +86,7 @@ button, input, textarea, select { font: inherit; color: inherit; }
   min-height: calc(56px + env(safe-area-inset-top, 0px));
   padding: env(safe-area-inset-top, 0px) 12px 0;
   background: var(--green);
-  color: #fff;
+  color: var(--on-primary);
 }
 .topbar h1 {
   flex: 1;
@@ -65,7 +102,7 @@ button, input, textarea, select { font: inherit; color: inherit; }
   padding: 0 12px 0 4px;
   border: 0;
   background: none;
-  color: #fff;
+  color: var(--on-primary);
   font-size: 17px;
   font-weight: 600;
   cursor: pointer;
@@ -78,7 +115,7 @@ button, input, textarea, select { font: inherit; color: inherit; }
   justify-content: center;
   min-width: 52px;
   min-height: 48px;
-  color: #fff;
+  color: var(--on-primary);
   text-decoration: none;
   font-size: 20px;
   line-height: 1.1;
@@ -100,7 +137,7 @@ main {
 .section-title { font-size: 18px; margin: 26px 0 10px; }
 
 .card {
-  background: var(--card);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 14px;
@@ -111,31 +148,31 @@ main {
   padding: 1px 8px;
   border-radius: 99px;
   background: var(--accent-soft);
-  color: #8a5a0c;
+  color: var(--accent-text);
   font-size: 13px;
   font-weight: 600;
   vertical-align: middle;
 }
-.badge-muted { background: #ebe8df; color: var(--muted); }
+.badge-muted { background: var(--badge-muted-bg); color: var(--muted); }
 
 .area-chip {
   display: inline-block;
   padding: 1px 9px;
   border-radius: 99px;
-  border: 2px solid var(--area-color, #999);
+  border: 2px solid var(--area-color, var(--area-none));
   color: var(--text);
   font-size: 13px;
   font-weight: 600;
-  background: #fff;
+  background: var(--surface);
 }
-.area-chip.none { border-color: #bbb; color: var(--muted); }
+.area-chip.none { border-color: var(--line-strong); color: var(--muted); }
 .area-dot {
   display: inline-block;
   width: 12px;
   height: 12px;
   margin-right: 8px;
   border-radius: 50%;
-  background: var(--area-color, #999);
+  background: var(--area-color, var(--area-none));
   vertical-align: 1px;
 }
 
@@ -149,7 +186,7 @@ main {
   padding: 0 18px;
   border: 2px solid var(--green);
   border-radius: var(--radius);
-  background: #fff;
+  background: var(--surface);
   color: var(--green-dark);
   font-size: 17px;
   font-weight: 700;
@@ -159,7 +196,7 @@ main {
 }
 .btn:active { transform: scale(0.98); }
 .btn:disabled { opacity: 0.5; }
-.btn-primary { background: var(--green); color: #fff; }
+.btn-primary { background: var(--green); color: var(--on-primary); }
 .btn-danger { border-color: var(--danger); color: var(--danger); }
 .btn-ghost { border: 0; min-height: 44px; padding: 0 4px; background: none; font-weight: 600; }
 .btn-big { width: 100%; min-height: 68px; font-size: 20px; margin: 14px 0 10px; }
@@ -170,7 +207,7 @@ main {
   padding: 0 12px;
   border: 1px solid var(--border);
   border-radius: 10px;
-  background: #fff;
+  background: var(--surface);
   color: var(--text);
   font-size: 14px;
   font-weight: 600;
@@ -200,7 +237,7 @@ main {
   max-width: 640px;
   margin: 0 auto;
   padding: 10px 14px calc(10px + var(--safe-bottom));
-  background: linear-gradient(to top, var(--bg) 75%, rgba(246, 243, 234, 0));
+  background: linear-gradient(to top, var(--bg) 75%, transparent);
 }
 .bottom-bar .btn { flex: 1; min-height: 60px; }
 .bottom-bar .btn-primary { flex: 2; }
@@ -212,7 +249,7 @@ main {
   padding: 4px;
   margin-bottom: 14px;
   border-radius: var(--radius);
-  background: #e6e1d3;
+  background: var(--surface-sunken);
 }
 .seg button {
   flex: 1;
@@ -224,7 +261,7 @@ main {
   color: var(--muted);
   cursor: pointer;
 }
-.seg button[aria-pressed="true"] { background: #fff; color: var(--text); box-shadow: 0 1px 3px rgba(0, 0, 0, .12); }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px var(--shadow); }
 
 /* ---- 一覧 ---- */
 .area-section, .name-group { margin-bottom: 22px; }
@@ -241,7 +278,7 @@ main {
   margin-left: 8px;
   padding: 0 8px;
   border-radius: 99px;
-  background: #e6e1d3;
+  background: var(--surface-sunken);
   font-size: 13px;
   color: var(--muted);
 }
@@ -256,7 +293,7 @@ main {
   border: 1px solid var(--border);
   border-left: 6px solid var(--area-color, var(--border));
   border-radius: var(--radius);
-  background: var(--card);
+  background: var(--surface);
   color: var(--text);
   text-decoration: none;
 }
@@ -267,12 +304,12 @@ main {
 .crop-name { font-size: 18px; font-weight: 700; }
 .crop-name small, .hero-name small { font-weight: 500; color: var(--muted); font-size: 15px; }
 .crop-sub { font-size: 14px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.chev { font-size: 26px; color: #b7b09d; flex: none; }
+.chev { font-size: 26px; color: var(--faint); flex: none; }
 
 .past {
   margin-top: 6px;
   border-radius: var(--radius);
-  background: #efebe0;
+  background: var(--surface-muted);
 }
 .past summary {
   min-height: 48px;
@@ -318,7 +355,7 @@ main {
   padding: 12px 14px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: var(--card);
+  background: var(--surface);
 }
 .record-head { display: flex; justify-content: space-between; align-items: center; }
 .record-date { font-weight: 700; }
@@ -329,7 +366,7 @@ main {
   background: var(--green-soft);
   font-size: 15px;
 }
-.stamp-chip.cat-observe { background: #f6e0dc; }
+.stamp-chip.cat-observe { background: var(--observe-soft); }
 .stamp-chip.cat-weather { background: var(--sky-soft); }
 .record-memo { margin: 8px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
 .record-with { margin: 8px 0 0; font-size: 14px; color: var(--muted); }
@@ -342,7 +379,7 @@ main {
   border: 0;
   border-radius: 10px;
   overflow: hidden;
-  background: #e6e1d3;
+  background: var(--surface-sunken);
   cursor: pointer;
 }
 .thumb img, .preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -355,10 +392,10 @@ main {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, .92);
+  background: var(--overlay);
 }
 .viewer img { max-width: 100%; max-height: 88vh; object-fit: contain; }
-.viewer-hint { color: #ccc; font-size: 14px; }
+.viewer-hint { color: var(--overlay-text); font-size: 14px; }
 
 /* ---- フォーム ---- */
 .field { margin-bottom: 22px; }
@@ -369,7 +406,7 @@ main {
   padding: 10px 14px;
   border: 2px solid var(--border);
   border-radius: var(--radius);
-  background: #fff;
+  background: var(--surface);
   font-size: 17px; /* 16px 以上で iPhone の自動ズームを防ぐ */
 }
 .input:focus { outline: none; border-color: var(--green); }
@@ -383,7 +420,7 @@ input[type="date"].input { appearance: none; -webkit-appearance: none; }
   height: var(--tap);
   border: 2px solid var(--border);
   border-radius: var(--radius);
-  background: #fff;
+  background: var(--surface);
   font-size: 30px;
   cursor: pointer;
 }
@@ -394,7 +431,7 @@ input[type="date"].input { appearance: none; -webkit-appearance: none; }
   margin-top: 8px;
   padding: 8px;
   border-radius: var(--radius);
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--border);
 }
 .icon-opt {
@@ -413,7 +450,7 @@ input[type="date"].input { appearance: none; -webkit-appearance: none; }
   padding: 0 14px;
   border: 1px solid var(--border);
   border-radius: 99px;
-  background: #fff;
+  background: var(--surface);
   font-size: 15px;
   cursor: pointer;
 }
@@ -429,9 +466,9 @@ input[type="date"].input { appearance: none; -webkit-appearance: none; }
   min-height: var(--tap);
   padding: 0 10px;
   border: 2px solid var(--border);
-  border-left: 8px solid var(--area-color, #bbb);
+  border-left: 8px solid var(--area-color, var(--line-strong));
   border-radius: var(--radius);
-  background: #fff;
+  background: var(--surface);
   font-weight: 700;
   cursor: pointer;
 }
@@ -458,9 +495,9 @@ input[type="date"].input { appearance: none; -webkit-appearance: none; }
   margin-bottom: 10px;
   padding: 10px 12px;
   border-radius: var(--radius);
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--border);
-  border-left: 6px solid var(--area-color, #bbb);
+  border-left: 6px solid var(--area-color, var(--line-strong));
 }
 .picker-head { display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
 .picker-group .chip-wrap { margin-top: 8px; }
@@ -478,7 +515,7 @@ input[type="date"].input { appearance: none; -webkit-appearance: none; }
   padding: 6px 2px;
   border: 2px solid var(--border);
   border-radius: var(--radius);
-  background: #fff;
+  background: var(--surface);
   cursor: pointer;
   user-select: none;
 }
@@ -489,14 +526,14 @@ input[type="date"].input { appearance: none; -webkit-appearance: none; }
   background: var(--green-soft);
   box-shadow: inset 0 0 0 2px var(--green);
 }
-.stamp.cat-observe[aria-pressed="true"] { border-color: var(--danger); background: #f6e0dc; box-shadow: inset 0 0 0 2px var(--danger); }
-.stamp.cat-weather[aria-pressed="true"] { border-color: #3b7fb5; background: var(--sky-soft); box-shadow: inset 0 0 0 2px #3b7fb5; }
+.stamp.cat-observe[aria-pressed="true"] { border-color: var(--observe); background: var(--observe-soft); box-shadow: inset 0 0 0 2px var(--observe); }
+.stamp.cat-weather[aria-pressed="true"] { border-color: var(--weather); background: var(--sky-soft); box-shadow: inset 0 0 0 2px var(--weather); }
 
 /* 記録：写真 */
 .photo-btns { display: flex; gap: 10px; }
 .photo-btns .btn { flex: 1; }
 .photo-previews { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-.preview { position: relative; width: 96px; height: 96px; border-radius: 10px; overflow: hidden; background: #e6e1d3; }
+.preview { position: relative; width: 96px; height: 96px; border-radius: 10px; overflow: hidden; background: var(--surface-sunken); }
 .preview-del {
   position: absolute;
   top: 4px;
@@ -505,8 +542,8 @@ input[type="date"].input { appearance: none; -webkit-appearance: none; }
   height: 32px;
   border: 0;
   border-radius: 50%;
-  background: rgba(0, 0, 0, .6);
-  color: #fff;
+  background: var(--overlay-soft);
+  color: var(--on-dark);
   font-size: 16px;
   cursor: pointer;
 }
@@ -519,7 +556,7 @@ input[type="date"].input { appearance: none; -webkit-appearance: none; }
   flex: none;
   width: 44px;
   height: 44px;
-  border: 3px solid #fff;
+  border: 3px solid var(--surface);
   border-radius: 50%;
   background: var(--area-color);
   box-shadow: 0 0 0 1px var(--border);
@@ -535,8 +572,8 @@ input[type="date"].input { appearance: none; -webkit-appearance: none; }
   max-width: calc(100% - 32px);
   padding: 12px 18px;
   border-radius: 12px;
-  background: rgba(30, 30, 28, .92);
-  color: #fff;
+  background: var(--toast-bg);
+  color: var(--on-dark);
   font-size: 15px;
   transform: translate(-50%, 20px);
   opacity: 0;

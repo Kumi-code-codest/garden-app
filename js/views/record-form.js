@@ -77,7 +77,7 @@ export async function render(ctx) {
         <button type="button" class="btn btn-ghost" data-act="toggle-picker">${isBulk ? '' : 'ほかの野菜も選ぶ ▾'}</button>
         <div class="crop-picker" ${isBulk ? '' : 'hidden'}>
           ${groups.filter((g) => g.crops.length).map((g) => `
-            <div class="picker-group" style="--area-color:${esc(g.area ? g.area.color : '#999')}">
+            <div class="picker-group" style="--area-color:${esc(g.area ? g.area.color : 'var(--area-none)')}">
               <div class="picker-head">
                 <span><span class="area-dot"></span>${esc(g.area ? g.area.name : 'エリア未設定')}</span>
                 <button type="button" class="btn-small" data-all="${esc(g.area ? g.area.id : '')}">全部</button>

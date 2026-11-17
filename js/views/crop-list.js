@@ -77,7 +77,7 @@ export async function render(ctx) {
     if (none.grow.length || none.past.length) sections.push(none);
 
     return sections.map(({ area, grow, past }) => `
-      <section class="area-section" style="--area-color:${esc(area ? area.color : '#999')}">
+      <section class="area-section" style="--area-color:${esc(area ? area.color : 'var(--area-none)')}">
         <h2 class="area-title"><span class="area-dot"></span>${esc(area ? area.name : 'エリア未設定')}<span class="count">${grow.length}</span></h2>
         ${grow.length
           ? grow.map((c) => card(c)).join('')
