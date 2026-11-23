@@ -4,11 +4,12 @@ import * as db from '../db.js';
 import { esc, formatDate, todayStr, daysBetween, roundLabel, areaChip, blobUrl, toast } from '../utils.js';
 import { STAMP_MAP, sortStamps } from '../stamps.js';
 import { moonOfDay } from '../moon.js';
+import { noteItem } from '../notes.js';
 
 export async function render(ctx) {
   const id = ctx.params.id;
-  const [crop, areas, crops, records] = await Promise.all([
-    db.getCrop(id), db.listAreas(), db.listCrops(), db.listRecordsByCrop(id),
+  const [crop, areas, crops, records, allNotes] = await Promise.all([
+    db.getCrop(id), db.listAreas(), db.listCrops(), db.listRecordsByCrop(id), db.listNotes(),
   ]);
   if (!crop) {
     ctx.setHeader({ title: '見つかりません', back: '#/' });
@@ -27,6 +28,16 @@ export async function render(ctx) {
   const rl = roundLabel(crop, crops);
   const days = daysBetween(crop.startedAt, isFinished && crop.finishedAt ? crop.finishedAt : todayStr());
   const harvestCount = records.filter((r) => r.stamps.includes('harvest')).length;
+
+  // 同じ名前の野菜のノート（年や作付けをまたいで使う知識なので名前で結びつける）
+  const selfHash = `#/crop/${id}`;
+  const notes = allNotes.filter((n) => n.vegName === crop.name);
+  const newNoteHref = `#/note/new?veg=${encodeURIComponent(crop.name)}&back=${encodeURIComponent(selfHash)}`;
+  const notesHtml = `
+    <h2 class="section-title section-row">📖 ${esc(crop.name)}のノート<a class="btn-small" href="${newNoteHref}">＋ 書く</a></h2>
+    ${notes.length
+      ? `<div class="card note-list">${notes.map((n) => noteItem(n, { back: selfHash })).join('')}</div>`
+      : '<p class="empty-small">育て方の知識や気付いたことを残しておけます。</p>'}`;
 
   // 記録を月ごとにまとめる
   let lastMonth = '';
@@ -74,6 +85,8 @@ export async function render(ctx) {
       <a class="btn" href="#/crop/new?from=${esc(id)}">🔁 もう一度植える</a>
       <button type="button" class="btn" data-act="status">${isFinished ? '↩️ 栽培中に戻す' : '🏁 栽培終了'}</button>
     </div>
+
+    ${notesHtml}
 
     <h2 class="section-title">記録</h2>
     ${records.length ? recordHtml : '<p class="empty-small">まだ記録がありません。「記録する」から始めましょう。</p>'}

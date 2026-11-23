@@ -2,7 +2,7 @@
 // 表示はキャッシュから即座に返し、裏で最新版を取りに行く（次回起動時に反映）。
 // ファイルを追加したら ASSETS に足し、公開時は CACHE の番号を上げる。
 
-const CACHE = 'garden-app-v2';
+const CACHE = 'garden-app-v3';
 const ASSETS = [
   './',
   'index.html',
@@ -15,6 +15,7 @@ const ASSETS = [
   'js/photo.js',
   'js/backup.js',
   'js/moon.js',
+  'js/notes.js',
   'js/views/crop-list.js',
   'js/views/crop-detail.js',
   'js/views/crop-form.js',
@@ -23,6 +24,9 @@ const ASSETS = [
   'js/views/calendar.js',
   'js/views/calendar-month.js',
   'js/views/calendar-year.js',
+  'js/views/note-list.js',
+  'js/views/note-view.js',
+  'js/views/note-form.js',
   'icons/icon-192.png',
   'icons/icon-512.png',
   'icons/apple-touch-icon.png',

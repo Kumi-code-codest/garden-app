@@ -19,6 +19,7 @@ export async function render(ctx) {
     title: '菜園きろく',
     actions: [
       { href: '#/calendar', icon: '📅', label: 'カレンダー' },
+      { href: '#/notes', icon: '📖', label: 'ノート' },
       { href: '#/settings', icon: '⚙️', label: '設定' },
     ],
   });

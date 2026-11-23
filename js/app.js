@@ -8,6 +8,9 @@ import * as cropForm from './views/crop-form.js';
 import * as recordForm from './views/record-form.js';
 import * as settings from './views/settings.js';
 import * as calendar from './views/calendar.js';
+import * as noteList from './views/note-list.js';
+import * as noteView from './views/note-view.js';
+import * as noteForm from './views/note-form.js';
 
 const routes = [
   { re: /^\/$/, view: cropList },
@@ -18,6 +21,10 @@ const routes = [
   { re: /^\/record\/([^/]+)\/edit$/, view: recordForm, keys: ['id'] },
   { re: /^\/settings$/, view: settings },
   { re: /^\/calendar$/, view: calendar },
+  { re: /^\/notes$/, view: noteList },
+  { re: /^\/note\/new$/, view: noteForm },
+  { re: /^\/note\/([^/]+)\/edit$/, view: noteForm, keys: ['id'] },
+  { re: /^\/note\/([^/]+)$/, view: noteView, keys: ['id'] },
 ];
 
 const main = document.getElementById('main');

@@ -19,8 +19,8 @@ async function dataURLToBlob(url) {
 }
 
 export async function exportBackup() {
-  const [areas, crops, records, photos] = await Promise.all([
-    db.listAreas(), db.listCrops(), db.listRecords(), db.listPhotos(),
+  const [areas, crops, records, photos, notes] = await Promise.all([
+    db.listAreas(), db.listCrops(), db.listRecords(), db.listPhotos(), db.listNotes(),
   ]);
   const photosOut = [];
   for (const p of photos) {
@@ -28,16 +28,16 @@ export async function exportBackup() {
   }
   const data = {
     app: 'garden-app',
-    version: 1,
+    version: 2,
     exportedAt: new Date().toISOString(),
-    areas, crops, records, photos: photosOut,
+    areas, crops, records, notes, photos: photosOut,
   };
   const file = new File(
     [JSON.stringify(data)],
     `garden-backup-${toDateStr(new Date())}.json`,
     { type: 'application/json' },
   );
-  return { file, counts: { crops: crops.length, records: records.length, photos: photos.length } };
+  return { file, counts: { crops: crops.length, records: records.length, notes: notes.length, photos: photos.length } };
 }
 
 // iPhone では共有シート（「ファイルに保存」など）、それ以外はダウンロード
@@ -82,7 +82,11 @@ export async function importBackup(file) {
     areas: data.areas || [],
     crops: data.crops || [],
     records: data.records || [],
+    notes: data.notes || [],
     photos,
   });
-  return { crops: data.crops.length, records: (data.records || []).length, photos: photos.length };
+  return {
+    crops: data.crops.length, records: (data.records || []).length,
+    notes: (data.notes || []).length, photos: photos.length,
+  };
 }

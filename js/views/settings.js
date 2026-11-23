@@ -112,7 +112,7 @@ export async function render(ctx) {
       const done = await saveFile(file);
       if (done) {
         await db.setMeta('lastBackupAt', Date.now());
-        toast(`書き出しました（作付け${counts.crops}・記録${counts.records}・写真${counts.photos}）`);
+        toast(`書き出しました（作付け${counts.crops}・記録${counts.records}・ノート${counts.notes}・写真${counts.photos}）`);
         ctx.refresh();
         return;
       }
@@ -130,7 +130,7 @@ export async function render(ctx) {
     if (!confirm('バックアップを読み込みますか？\n今のデータは消えません。同じデータは上書きされます。')) return;
     try {
       const c = await importBackup(file);
-      toast(`読み込みました（作付け${c.crops}・記録${c.records}・写真${c.photos}）`);
+      toast(`読み込みました（作付け${c.crops}・記録${c.records}・ノート${c.notes}・写真${c.photos}）`);
       ctx.refresh();
     } catch (err) {
       toast(err.message);

@@ -1,10 +1,10 @@
 // IndexedDB の読み書き
-// ストア: areas（エリア）/ crops（作付け）/ records（記録）/ photos（写真）/ meta（設定・初期化フラグ）
+// ストア: areas（エリア）/ crops（作付け）/ records（記録）/ photos（写真）/ notes（ノート）/ meta（設定・初期化フラグ）
 
 import { uuid, AREA_COLORS } from './utils.js';
 
 const DB_NAME = 'garden-app';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 let dbPromise;
 
@@ -31,6 +31,10 @@ export function openDB() {
           photos.createIndex('recordId', 'recordId');
 
           db.createObjectStore('meta', { keyPath: 'key' });
+        }
+        if (e.oldVersion < 2) {
+          const notes = db.createObjectStore('notes', { keyPath: 'id' });
+          notes.createIndex('vegName', 'vegName');
         }
       };
       req.onsuccess = () => resolve(req.result);
@@ -214,6 +218,21 @@ export function deleteRecord(id) {
   });
 }
 
+// ---- notes（基礎知識・気付き） ----
+
+export async function listNotes() {
+  const notes = await getAll('notes');
+  return notes.sort((a, b) => b.updatedAt - a.updatedAt);
+}
+export const getNote = (id) => getOne('notes', id);
+
+export function saveNote(note) {
+  const now = Date.now();
+  return putOne('notes', { ...note, createdAt: note.createdAt ?? now, updatedAt: now });
+}
+
+export const deleteNote = (id) => run(['notes'], 'readwrite', (tx) => { tx.objectStore('notes').delete(id); });
+
 // ---- photos ----
 
 export const getPhoto = (id) => getOne('photos', id);
@@ -221,8 +240,9 @@ export const listPhotos = () => getAll('photos');
 
 // ---- バックアップ復元用：まとめて書き込む ----
 
-export function putMany({ areas = [], crops = [], records = [], photos = [] }) {
-  return run(['areas', 'crops', 'records', 'photos', 'meta'], 'readwrite', (tx) => {
+export function putMany({ areas = [], crops = [], records = [], photos = [], notes = [] }) {
+  return run(['areas', 'crops', 'records', 'photos', 'notes', 'meta'], 'readwrite', (tx) => {
+    notes.forEach((x) => tx.objectStore('notes').put(x));
     areas.forEach((x) => tx.objectStore('areas').put(x));
     crops.forEach((x) => tx.objectStore('crops').put(x));
     records.forEach((x) => tx.objectStore('records').put(x));
